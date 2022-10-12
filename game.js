@@ -83,6 +83,7 @@ dvdLogo = {
     hPos: vec(9,2)
 }
 
+//changes to a random color, use to switch colors
 function randColor() {
     switch(floor(rnd(6))){
         case 0:
