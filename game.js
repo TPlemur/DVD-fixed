@@ -131,9 +131,9 @@ function update() {
     if (!ticks) {
         audio.play();
     }
-    //render logo based based on dvdLogo.pos
-    dvdLogo.render();
 
+
+    //update logo position, and reflect if necessasary
     dvdLogo.pos.x += dvdLogo.vel.x;
     dvdLogo.pos.y += dvdLogo.vel.y;
     if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
@@ -143,6 +143,9 @@ function update() {
         randColor();
         dvdLogo.vel.x *= -1;
     }
+
+        //render logo 
+        dvdLogo.render();
 }
 
 addEventListener("load", onLoad);
