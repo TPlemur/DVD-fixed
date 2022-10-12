@@ -86,11 +86,12 @@ dvdLogo = {
 options = {
     viewSize: {x: G.WIDTH, y:G.HEIGHT},
 };
+var audio = new Audio('music.mp3');
 
 function update() {
     if (!ticks) {
     }
-
+    audio.play();
     //render logo based based on dvdLogo.pos
     char('a',dvdLogo.pos.x+dvdLogo.aPos.x,dvdLogo.pos.y+dvdLogo.aPos.y);
     char('b',dvdLogo.pos.x+dvdLogo.bPos.x,dvdLogo.pos.y+dvdLogo.bPos.y);
