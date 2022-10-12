@@ -83,6 +83,29 @@ dvdLogo = {
     hPos: vec(9,2)
 }
 
+function randColor() {
+    switch(floor(rnd(6))){
+        case 0:
+            color('black')
+            break
+        case 1:
+            color('blue')
+            break
+        case 2:
+            color('green')
+            break
+        case 3:
+            color('cyan')
+            break
+        case 4:
+            color('purple')
+            break
+        case 5:
+            color('red')
+            break
+    }
+}
+
 options = {
     viewSize: {x: G.WIDTH, y:G.HEIGHT},
 };
@@ -90,7 +113,8 @@ options = {
 function update() {
     if (!ticks) {
     }
-
+    
+    randColor();
     //render logo based based on dvdLogo.pos
     char('a',dvdLogo.pos.x+dvdLogo.aPos.x,dvdLogo.pos.y+dvdLogo.aPos.y);
     char('b',dvdLogo.pos.x+dvdLogo.bPos.x,dvdLogo.pos.y+dvdLogo.bPos.y);
