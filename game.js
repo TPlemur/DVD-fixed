@@ -68,11 +68,16 @@ ll
 const G ={
    WIDTH: 150,
    HEIGHT: 150, 
-   BPM: 80 //BPM of song - change as necessasary
+   BPM: 80, //BPM of song - change as necessasary
+   BOUNDS_RIGHT: 150 - 11,
+   BOUNDS_LEFT: 10,
+   BOUNDS_TOP: 6,
+   BOUNDS_BOT: 150 - 5,
 };
 
 dvdLogo = {
     pos: vec(G.WIDTH/2,G.HEIGHT/2),
+    vel: vec(1/2, sqrt(3)/2),
     aPos: vec(-7,-3),
     bPos: vec(-1,-3),
     cPos: vec(5,-3),
@@ -124,11 +129,20 @@ var audio = new Audio('music.mp3');
 
 function update() {
     if (!ticks) {
+        audio.play();
     }
-    audio.play();
-    randColor();
     //render logo based based on dvdLogo.pos
     dvdLogo.render();
+
+    dvdLogo.pos.x += dvdLogo.vel.x;
+    dvdLogo.pos.y += dvdLogo.vel.y;
+    if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
+        randColor();
+        dvdLogo.vel.y *= -1;
+    }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
+        randColor();
+        dvdLogo.vel.x *= -1;
+    }
 }
 
 addEventListener("load", onLoad);
