@@ -1,6 +1,6 @@
 title = "DVD";
 
-description = ``;
+description = `[press] to the beat`;
 
 characters = [
 `
@@ -202,6 +202,7 @@ function randColor() {
 
 options = {
     viewSize: {x: G.WIDTH, y:G.HEIGHT},
+    theme: 'crt'
 };
 var audio = new Audio('music.mp3');
 
