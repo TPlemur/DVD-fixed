@@ -223,12 +223,10 @@ function update() {
         randColor();
         dvdLogo.vel.y *= -1;
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
-        console.log(dvdLogo.speed)
     }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
         randColor();
         dvdLogo.vel.x *= -1;
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
-        console.log(dvdLogo.speed)
     }
     dvdLogo.pos.clamp(G.BOUNDS_LEFT,G.BOUNDS_RIGHT,G.BOUNDS_TOP,G.BOUNDS_BOT);
 
