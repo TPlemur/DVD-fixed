@@ -70,18 +70,20 @@ const G ={
    HEIGHT: 150, 
    BPM: 76.555, //BPM of song - change as necessasary
    BPS: 76.555/60,
-   BPT: (76.555/60)/60,
+   BPT: (76.555/60)/60, //Beats per tick - actualy useful for distance calculation
+   //offsets so that sprite bouces at edge of screen
    BOUNDS_RIGHT:200-11,
    BOUNDS_LEFT:10,
    BOUNDS_TOP:6,
    BOUNDS_BOT:150-5,
-   LASTCOLOR:0
+   LASTCOLOR:0 //ensures no color duplication
 };
 
 dvdLogo = {
-    pos: vec(G.WIDTH/2,G.HEIGHT/2),
-    vel: vec(1/2, sqrt(3)/2),
-    speed: 1,
+    pos: vec(G.WIDTH/2,G.HEIGHT/2), //location of center of sprite
+    vel: vec(1/2, sqrt(3)/2),       //direction of movement
+    speed: 1,                       //distace travled per tick
+    //offsets for the sprites
     aPos: vec(-7,-3),
     bPos: vec(-1,-3),
     cPos: vec(5,-3),
@@ -90,6 +92,7 @@ dvdLogo = {
     fPos: vec(-1,2),
     gPos: vec(5,2),
     hPos: vec(9,2),
+    //renders all sprites with appropreate offsets
     render: function render(){
         char('a',dvdLogo.pos.x+dvdLogo.aPos.x,dvdLogo.pos.y+dvdLogo.aPos.y);
         char('b',dvdLogo.pos.x+dvdLogo.bPos.x,dvdLogo.pos.y+dvdLogo.bPos.y);
@@ -130,6 +133,7 @@ function calcDist(G,D){
             if(l<b){left = true}else{bot=true}
         }
     }
+    //find dist by similar triangles
     if(topint){return abs((G.BOUNDS_TOP-D.pos.y)/D.vel.y)}
     if(bot){return abs((G.BOUNDS_BOT-D.pos.y)/D.vel.y)}
     if(left){return abs((G.BOUNDS_LEFT-D.pos.x)/D.vel.x)}
@@ -205,7 +209,9 @@ options = {
     viewSize: {x: G.WIDTH, y:G.HEIGHT},
     theme: 'crt'
 };
-var audio = new Audio('music.mp3');
+
+//upload music file
+var audio = new Audio('music.mp3'); 
 
 function update() {
     if (!ticks) {
@@ -217,26 +223,30 @@ function update() {
         end();
     }
     
-    //update logo position, and reflect if necessasary
+    //update logo position
     dvdLogo.pos.x += dvdLogo.vel.x*dvdLogo.speed;
     dvdLogo.pos.y += dvdLogo.vel.y*dvdLogo.speed;
+
+    //detect if logo is out of bounds
     //bounce off the top or the bottom
     if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
-        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90); //sparkles
-        randColor(); //change color
-        dvdLogo.vel.y *= -1; //actual bounce
-        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT; //calculate new speed
+        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
+        randColor();                                        //change color
+        dvdLogo.vel.y *= -1;                                //actual bounce
+        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
     //bounce off the left or the right
     }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
-        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90); //sparkles
-        randColor(); //change color
-        dvdLogo.vel.x *= -1; //actual bounce
-        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT; //calculate new speed
+        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
+        randColor();                                        //change color
+        dvdLogo.vel.x *= -1;                                //actual bounce
+        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
     }
+
+    //ensure logo is never out of bounds at the end of a tick
     dvdLogo.pos.clamp(G.BOUNDS_LEFT,G.BOUNDS_RIGHT,G.BOUNDS_TOP,G.BOUNDS_BOT);
 
-        //render logo 
-        dvdLogo.render();
+    //render logo 
+    dvdLogo.render();
 }
 
 addEventListener("load", onLoad);
