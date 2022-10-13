@@ -74,7 +74,8 @@ const G ={
    BOUNDS_RIGHT:200-11,
    BOUNDS_LEFT:10,
    BOUNDS_TOP:6,
-   BOUNDS_BOT:150-5
+   BOUNDS_BOT:150-5,
+   LASTCOLOR:0
 };
 
 dvdLogo = {
@@ -137,22 +138,64 @@ function calcDist(G,D){
 function randColor() {
     switch(floor(rnd(6))){
         case 0:
-            color('black')
+            if(G.LASTCOLOR ==0){
+                color('blue');
+                G.LASTCOLOR = 1;
+            }
+            else{
+                color('black')
+                G.LASTCOLOR = 0
+            }
             break
         case 1:
-            color('blue')
+            if(G.LASTCOLOR == 1){
+                color('green');
+                G.LASTCOLOR = 2;
+            }
+            else{
+                color('blue')
+                G.LASTCOLOR = 1;
+            }
             break
         case 2:
-            color('green')
+            if(G.LASTCOLOR == 2){
+                color('cyan');
+                G.LASTCOLOR = 3;
+            }
+            else{
+                color('green')
+                G.LASTCOLOR = 2;
+            }
             break
         case 3:
-            color('cyan')
+            if(G.LASTCOLOR == 3){
+                color('purple');
+                G.LASTCOLOR = 4;
+            }
+            else{
+                color('cyan')
+                G.LASTCOLOR = 3;
+            }
             break
         case 4:
-            color('purple')
+            if(G.LASTCOLOR == 4){
+                color('red');
+                G.LASTCOLOR = 5;
+            }
+            else{
+                color('purple')
+                G.LASTCOLOR = 4;
+            }
             break
         case 5:
-            color('red')
+            if(G.LASTCOLOR == 5){
+                color('black');
+                G.LASTCOLOR = 0;
+            }
+            else{
+                color('red')
+                G.LASTCOLOR = 5;
+            }
             break
     }
 }
