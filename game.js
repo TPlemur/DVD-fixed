@@ -102,6 +102,7 @@ dvdLogo = {
     },
 }
 
+//calculates the distance to the next bounce
 function calcDist(G,D){
     //figure out which side the next bounce will be on
     right = false
