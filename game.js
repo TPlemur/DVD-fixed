@@ -220,16 +220,18 @@ function update() {
     //update logo position, and reflect if necessasary
     dvdLogo.pos.x += dvdLogo.vel.x*dvdLogo.speed;
     dvdLogo.pos.y += dvdLogo.vel.y*dvdLogo.speed;
+    //bounce off the top or the bottom
     if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
-        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);
-        randColor();
-        dvdLogo.vel.y *= -1;
-        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
+        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90); //sparkles
+        randColor(); //change color
+        dvdLogo.vel.y *= -1; //actual bounce
+        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT; //calculate new speed
+    //bounce off the left or the right
     }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
-        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);
-        randColor();
-        dvdLogo.vel.x *= -1;
-        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
+        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90); //sparkles
+        randColor(); //change color
+        dvdLogo.vel.x *= -1; //actual bounce
+        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT; //calculate new speed
     }
     dvdLogo.pos.clamp(G.BOUNDS_LEFT,G.BOUNDS_RIGHT,G.BOUNDS_TOP,G.BOUNDS_BOT);
 
