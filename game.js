@@ -66,10 +66,12 @@ ll
 ];
 
 const G ={
-   WIDTH: 150,
+   WIDTH: 200,
    HEIGHT: 150, 
    BPM: 76.555, //BPM of song - change as necessasary
-   BOUNDS_RIGHT:150-11,
+   BPS: 76.555/60,
+   BPT: (76.555/60)/60,
+   BOUNDS_RIGHT:200-11,
    BOUNDS_LEFT:10,
    BOUNDS_TOP:6,
    BOUNDS_BOT:150-5
@@ -78,6 +80,7 @@ const G ={
 dvdLogo = {
     pos: vec(G.WIDTH/2,G.HEIGHT/2),
     vel: vec(1/2, sqrt(3)/2),
+    speed: 1,
     aPos: vec(-7,-3),
     bPos: vec(-1,-3),
     cPos: vec(5,-3),
@@ -125,12 +128,11 @@ function calcDist(G,D){
             if(l<b){left = true}else{bot=true}
         }
     }
-    if(topint){console.log("top")}
-    if(bot){console.log("bot")}
-    if(left){console.log("left")}
-    if(right){console.log("right")}
+    if(topint){return abs((G.BOUNDS_TOP-D.pos.y)/D.vel.y)}
+    if(bot){return abs((G.BOUNDS_BOT-D.pos.y)/D.vel.y)}
+    if(left){return abs((G.BOUNDS_LEFT-D.pos.x)/D.vel.x)}
+    if(right){return abs((G.BOUNDS_RIGHT-D.pos.x)/D.vel.x)}
 }
-
 //changes to a random color, use to switch colors
 function randColor() {
     switch(floor(rnd(6))){
@@ -171,17 +173,20 @@ function update() {
     }
     
     //update logo position, and reflect if necessasary
-    dvdLogo.pos.x += dvdLogo.vel.x*0.4;
-    dvdLogo.pos.y += dvdLogo.vel.y*0.4;
+    dvdLogo.pos.x += dvdLogo.vel.x*dvdLogo.speed;
+    dvdLogo.pos.y += dvdLogo.vel.y*dvdLogo.speed;
     if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
         randColor();
         dvdLogo.vel.y *= -1;
-        calcDist(G,dvdLogo);
+        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
+        console.log(dvdLogo.speed)
     }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
         randColor();
         dvdLogo.vel.x *= -1;
-        calcDist(G,dvdLogo);
+        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
+        console.log(dvdLogo.speed)
     }
+    dvdLogo.pos.clamp(G.BOUNDS_LEFT,G.BOUNDS_RIGHT,G.BOUNDS_TOP,G.BOUNDS_BOT);
 
         //render logo 
         dvdLogo.render();
