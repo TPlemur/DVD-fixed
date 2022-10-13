@@ -129,10 +129,14 @@ var audio = new Audio('music.mp3');
 
 function update() {
     if (!ticks) {
+        //play music at start of game
         audio.play();
     }
-
-
+    // end the game if music is finished
+    if(audio.paused){
+        end();
+    }
+    
     //update logo position, and reflect if necessasary
     dvdLogo.pos.x += dvdLogo.vel.x;
     dvdLogo.pos.y += dvdLogo.vel.y;
