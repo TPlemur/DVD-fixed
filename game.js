@@ -98,6 +98,39 @@ dvdLogo = {
     },
 }
 
+function calcDist(G,D){
+    //figure out which side the next bounce will be on
+    right = false
+    topint = false
+    bot = false
+    left = false
+    if(D.vel.x > 0 ){//is it possible to hit right
+        if(D.vel.y < 0){//is it possible to hit top
+            r = (G.BOUNDS_RIGHT-D.pos.x)/D.vel.x
+            t = (G.BOUNDS_TOP-D.pos.y)/D.vel.y
+            if(r<t){right = true}else{topint = true}
+        }else{//is it possible to hit bot
+            r = (G.BOUNDS_RIGHT-D.pos.x)/D.vel.x
+            b = (G.BOUNDS_BOT-D.pos.y)/D.vel.y
+            if(r<b){right = true}else{bot=true}
+        }
+    }else{ //is it possible to hit left
+        if(D.vel.y < 0){//is it possible to hit top
+            l = (G.BOUNDS_LEFT-D.pos.x)/D.vel.x
+            t = (G.BOUNDS_TOP-D.pos.y)/D.vel.y
+            if(l<t){left = true}else{topint=true}
+        }else{//is it possible to hit bot
+            l = (G.BOUNDS_LEFT-D.pos.x)/D.vel.x
+            b = (G.BOUNDS_BOT-D.pos.y)/D.vel.y
+            if(l<b){left = true}else{bot=true}
+        }
+    }
+    if(topint){console.log("top")}
+    if(bot){console.log("bot")}
+    if(left){console.log("left")}
+    if(right){console.log("right")}
+}
+
 //changes to a random color, use to switch colors
 function randColor() {
     switch(floor(rnd(6))){
@@ -134,14 +167,16 @@ function update() {
 
 
     //update logo position, and reflect if necessasary
-    dvdLogo.pos.x += dvdLogo.vel.x;
-    dvdLogo.pos.y += dvdLogo.vel.y;
+    dvdLogo.pos.x += dvdLogo.vel.x*0.4;
+    dvdLogo.pos.y += dvdLogo.vel.y*0.4;
     if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
         randColor();
         dvdLogo.vel.y *= -1;
+        calcDist(G,dvdLogo);
     }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
         randColor();
         dvdLogo.vel.x *= -1;
+        calcDist(G,dvdLogo);
     }
 
         //render logo 
