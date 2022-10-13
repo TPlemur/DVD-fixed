@@ -221,10 +221,12 @@ function update() {
     dvdLogo.pos.x += dvdLogo.vel.x*dvdLogo.speed;
     dvdLogo.pos.y += dvdLogo.vel.y*dvdLogo.speed;
     if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
+        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);
         randColor();
         dvdLogo.vel.y *= -1;
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
     }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
+        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);
         randColor();
         dvdLogo.vel.x *= -1;
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
