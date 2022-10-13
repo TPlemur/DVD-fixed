@@ -68,7 +68,11 @@ ll
 const G ={
    WIDTH: 150,
    HEIGHT: 150, 
-   BPM: 80 //BPM of song - change as necessasary
+   BPM: 80, //BPM of song - change as necessasary
+   BOUNDS_RIGHT:150-11,
+   BOUNDS_LEFT:10,
+   BOUNDS_TOP:6,
+   BOUNDS_BOT:150-5
 };
 
 dvdLogo = {
