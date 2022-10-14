@@ -237,7 +237,7 @@ function update() {
     //detect if logo is out of bounds
     //bounce off the top or the bottom
     if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
-        if ((input.isJustPressed || input.isJustReleased) && timer <= 50) {
+        if ((input.isJustPressed || input.isJustReleased || input.isPressed) && timer <= 50) {
             play("coin");
             addScore(10)
             // console.log(timer)
@@ -250,7 +250,7 @@ function update() {
 
     //bounce off the left or the right
     }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
-        if ((input.isJustPressed || input.isJustReleased) && timer <= 50) {
+        if ((input.isJustPressed || input.isJustReleased || input.isPressed) && timer <= 50) {
             play("coin");
             addScore(10)
             // console.log(timer)
