@@ -230,16 +230,26 @@ function update() {
     //detect if logo is out of bounds
     //bounce off the top or the bottom
     if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
+        if (input.isPressed) {
+            play("select");
+            addScore(10)
+        }
         particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
         randColor();                                        //change color
         dvdLogo.vel.y *= -1;                                //actual bounce
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
+        
     //bounce off the left or the right
     }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
+        if (input.isPressed) {
+            play("select");
+            addScore(10)
+        }
         particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
         randColor();                                        //change color
         dvdLogo.vel.x *= -1;                                //actual bounce
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
+        
     }
 
     //ensure logo is never out of bounds at the end of a tick
