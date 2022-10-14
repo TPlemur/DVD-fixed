@@ -212,44 +212,55 @@ options = {
 
 //upload music file
 var audio = new Audio('music.mp3'); 
+timer = 0;
 
 function update() {
     if (!ticks) {
         //play music at start of game
         audio.play();
+        
     }
     // end the game if music is finished
     if(audio.paused){
         end();
     }
+    timer++;
+    // console.log(timer)
     
     //update logo position
     dvdLogo.pos.x += dvdLogo.vel.x*dvdLogo.speed;
     dvdLogo.pos.y += dvdLogo.vel.y*dvdLogo.speed;
 
+    
+    
+
     //detect if logo is out of bounds
     //bounce off the top or the bottom
     if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
-        if (input.isPressed) {
-            play("select");
+        if ((input.isJustPressed || input.isJustReleased) && timer <= 50) {
+            play("coin");
             addScore(10)
+            // console.log(timer)
         }
         particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
         randColor();                                        //change color
         dvdLogo.vel.y *= -1;                                //actual bounce
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
-        
+        timer = 0;
+
     //bounce off the left or the right
     }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
-        if (input.isPressed) {
-            play("select");
+        if ((input.isJustPressed || input.isJustReleased) && timer <= 50) {
+            play("coin");
             addScore(10)
+            // console.log(timer)
         }
         particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
         randColor();                                        //change color
         dvdLogo.vel.x *= -1;                                //actual bounce
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
-        
+        timer = 0;
+
     }
 
     //ensure logo is never out of bounds at the end of a tick
