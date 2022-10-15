@@ -68,21 +68,33 @@ ll
 const G ={
    WIDTH: 200,
    HEIGHT: 150, 
-   BPM: 76.555, //BPM of song - change as necessasary
-   BPS: 76.555/60,
-   BPT: (76.555/60)/60, //Beats per tick - actualy useful for distance calculation
+   BPM: 120, //BPM of song - change as necessasary
+   BPS: 0,
+   BPT: 0, //Beats per tick - actualy useful for distance calculation
+   TPB: 0,
+   MILISPERBEAT: 0, //number of miliseconds between ticks
    //offsets so that sprite bouces at edge of screen
    BOUNDS_RIGHT:200-11,
    BOUNDS_LEFT:10,
    BOUNDS_TOP:6,
    BOUNDS_BOT:150-5,
-   LASTCOLOR:0 //ensures no color duplication
+   LASTCOLOR:0, //ensures no color duplication
+   TIMERWIDTH: 80, //the number of miliseconds on either side of a bounce that are valid for scoring
+   TIMER: 0,
+   LAST_CLOCK: 0, //used for getting the system clock
+   DELTA_TIME: 0  //time between ticks
 };
+G.BPS = G.BPM/60;
+G.BPT = G.BPS/60;
+G.TPB = 1/G.BPT;
+G.MILISPERBEAT = 60000/G.BPM;
 
 dvdLogo = {
     pos: vec(G.WIDTH/2,G.HEIGHT/2), //location of center of sprite
     vel: vec(1/2, sqrt(3)/2),       //direction of movement
-    speed: 1,                       //distace travled per tick
+    normVel: vec(0,0),
+    dist: 1,                       //distace travled per tick
+    nextBounce: "foo",
     //offsets for the sprites
     aPos: vec(-7,-3),
     bPos: vec(-1,-3),
@@ -104,6 +116,8 @@ dvdLogo = {
         char('h',dvdLogo.pos.x+dvdLogo.hPos.x,dvdLogo.pos.y+dvdLogo.hPos.y);
     },
 }
+dvdLogo.normVel.x = dvdLogo.vel.x/(sqrt(dvdLogo.vel.x**2+dvdLogo.vel.y**2));
+dvdLogo.normVel.y = dvdLogo.vel.y/(sqrt(dvdLogo.vel.x**2+dvdLogo.vel.y**2));
 
 //calculates the distance to the next bounce
 function calcDist(G,D){
@@ -112,32 +126,32 @@ function calcDist(G,D){
     topint = false
     bot = false
     left = false
-    if(D.vel.x > 0 ){//is it possible to hit right
-        if(D.vel.y < 0){//is it possible to hit top
-            r = (G.BOUNDS_RIGHT-D.pos.x)/D.vel.x
-            t = (G.BOUNDS_TOP-D.pos.y)/D.vel.y
+    if(D.normVel.x > 0 ){//is it possible to hit right
+        if(D.normVel.y < 0){//is it possible to hit top
+            r = (G.BOUNDS_RIGHT-D.pos.x)/D.normVel.x
+            t = (G.BOUNDS_TOP-D.pos.y)/D.normVel.y
             if(r<t){right = true}else{topint = true}
         }else{//is it possible to hit bot
-            r = (G.BOUNDS_RIGHT-D.pos.x)/D.vel.x
-            b = (G.BOUNDS_BOT-D.pos.y)/D.vel.y
+            r = (G.BOUNDS_RIGHT-D.pos.x)/D.normVel.x
+            b = (G.BOUNDS_BOT-D.pos.y)/D.normVel.y
             if(r<b){right = true}else{bot=true}
         }
     }else{ //is it possible to hit left
-        if(D.vel.y < 0){//is it possible to hit top
-            l = (G.BOUNDS_LEFT-D.pos.x)/D.vel.x
-            t = (G.BOUNDS_TOP-D.pos.y)/D.vel.y
+        if(D.normVel.y < 0){//is it possible to hit top
+            l = (G.BOUNDS_LEFT-D.pos.x)/D.normVel.x
+            t = (G.BOUNDS_TOP-D.pos.y)/D.normVel.y
             if(l<t){left = true}else{topint=true}
         }else{//is it possible to hit bot
-            l = (G.BOUNDS_LEFT-D.pos.x)/D.vel.x
-            b = (G.BOUNDS_BOT-D.pos.y)/D.vel.y
+            l = (G.BOUNDS_LEFT-D.pos.x)/D.normVel.x
+            b = (G.BOUNDS_BOT-D.pos.y)/D.normVel.y
             if(l<b){left = true}else{bot=true}
         }
     }
     //find dist by similar triangles
-    if(topint){return abs((G.BOUNDS_TOP-D.pos.y)/D.vel.y)}
-    if(bot){return abs((G.BOUNDS_BOT-D.pos.y)/D.vel.y)}
-    if(left){return abs((G.BOUNDS_LEFT-D.pos.x)/D.vel.x)}
-    if(right){return abs((G.BOUNDS_RIGHT-D.pos.x)/D.vel.x)}
+    if(topint){D.nextBounce = "t";return abs((G.BOUNDS_TOP-D.pos.y)/D.normVel.y)}
+    if(bot){D.nextBounce = "b";return abs((G.BOUNDS_BOT-D.pos.y)/D.normVel.y)}
+    if(left){D.nextBounce = "l";return abs((G.BOUNDS_LEFT-D.pos.x)/D.normVel.x)}
+    if(right){D.nextBounce = "r";return abs((G.BOUNDS_RIGHT-D.pos.x)/D.normVel.x)}
 }
 //changes to a random color, use to switch colors
 function randColor() {
@@ -211,56 +225,66 @@ options = {
 };
 
 //upload music file
-var audio = new Audio('music.mp3'); 
-timer = 0;
+var audio = new Audio('120Click.mp3'); //'Disco Dance.mp3'
 
 function update() {
     if (!ticks) {
         //play music at start of game
-        audio.play();
-        
+        audio.play();//reset everything
+        dvdLogo.pos.x = G.WIDTH/2;
+        dvdLogo.pos.y = G.HEIGHT/2;
+        dvdLogo.vel = vec(1/2, sqrt(3)/2);
+        dvdLogo.dist = calcDist(G,dvdLogo);
+        G.TIMER = 0;
+        G.LAST_CLOCK = Date.now();
     }
+    //get time between ticks
+    G.DELTA_TIME = Date.now() - G.LAST_CLOCK;
+    G.LAST_CLOCK = Date.now();
     // end the game if music is finished
     if(audio.paused){
         end();
     }
-    timer++;
-    // console.log(timer)
-    
+    G.TIMER +=G.DELTA_TIME;
+
+    netSpeed = dvdLogo.dist/G.MILISPERBEAT;
     //update logo position
-    dvdLogo.pos.x += dvdLogo.vel.x*dvdLogo.speed;
-    dvdLogo.pos.y += dvdLogo.vel.y*dvdLogo.speed;
+    dvdLogo.pos.x += dvdLogo.normVel.x*netSpeed*G.DELTA_TIME;
+    dvdLogo.pos.y += dvdLogo.normVel.y*netSpeed*G.DELTA_TIME;
 
-    
-    
 
-    //detect if logo is out of bounds
-    //bounce off the top or the bottom
-    if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
-        if ((input.isJustPressed || input.isJustReleased || input.isPressed) && timer <= 50) {
+    //check for input on beat
+    if(input.isJustPressed){
+        //check for within timerBuffer
+        if(G.TIMER < G.TIMERWIDTH || G.TIMER > (G.MILISPERBEAT - G.TIMERWIDTH)){
             play("coin");
-            addScore(10)
-            // console.log(timer)
+            addScore(10);
         }
-        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
-        randColor();                                        //change color
-        dvdLogo.vel.y *= -1;                                //actual bounce
-        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
-        timer = 0;
-
-    //bounce off the left or the right
-    }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
-        if ((input.isJustPressed || input.isJustReleased || input.isPressed) && timer <= 50) {
-            play("coin");
-            addScore(10)
-            // console.log(timer)
+        else{
+            addScore(-1);
         }
-        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
-        randColor();                                        //change color
-        dvdLogo.vel.x *= -1;                                //actual bounce
-        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
-        timer = 0;
+    }
 
+    //Maintains perfect sync with TPB
+    if(G.TIMER >= G.MILISPERBEAT){ //detect if time/beat has been reached
+        //detect if logo is out of bounds
+        //bounce off the top or the bottom
+        if(dvdLogo.nextBounce == "t"|| dvdLogo.nextBounce == "b"){
+            particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
+            randColor();                                        //change color
+            dvdLogo.normVel.y *= -1;                            //actual bounce
+            dvdLogo.dist = calcDist(G,dvdLogo);                 //calculate new distance
+            G.TIMER -= 500;                                     //reset timer, but accounting for slop
+
+        //bounce off the left or the right
+        }else{
+            particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
+            randColor();                                        //change color
+            dvdLogo.normVel.x *= -1;                            //actual bounce
+            dvdLogo.dist = calcDist(G,dvdLogo);                 //calculate new speed
+            G.TIMER -= 500;                                     //reset timer, but accounting for slop
+
+        }
     }
 
     //ensure logo is never out of bounds at the end of a tick
