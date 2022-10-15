@@ -77,7 +77,9 @@ const G ={
    BOUNDS_LEFT:10,
    BOUNDS_TOP:6,
    BOUNDS_BOT:150-5,
-   LASTCOLOR:0 //ensures no color duplication
+   LASTCOLOR:0, //ensures no color duplication
+   TIMERWIDTH: 5, //the number of ticks on either side of a bounce that are valid for scoring
+   TIMER: 0
 };
 G.BPS = G.BPM/60;
 G.BPT = G.BPS/60;
@@ -216,54 +218,53 @@ options = {
 
 //upload music file
 var audio = new Audio('Disco Dance.mp3'); 
-timer = 0;
 
 function update() {
     if (!ticks) {
         //play music at start of game
         audio.play();
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
+        G.TIMER = 0;
     }
     // end the game if music is finished
     if(audio.paused){
         end();
     }
-    timer++;
+    G.TIMER++;
     // console.log(timer)
     
     //update logo position
     dvdLogo.pos.x += dvdLogo.vel.x*dvdLogo.speed;
     dvdLogo.pos.y += dvdLogo.vel.y*dvdLogo.speed;
 
-    
-    
+    //check for input on beat
+    if(input.isJustPressed){
+        //check for within timerBuffer
+        if(G.TIMER < G.TIMERWIDTH || G.TIMER > (G.TPB - G.TIMERWIDTH)){
+            play("coin");
+            addScore(10);
+        }
+        else{
+            addScore(-1);
+        }
+    }
 
     //detect if logo is out of bounds
     //bounce off the top or the bottom
     if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
-        if ((input.isJustPressed || input.isJustReleased || input.isPressed) && timer <= 50) {
-            play("coin");
-            addScore(10)
-            // console.log(timer)
-        }
         particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
         randColor();                                        //change color
         dvdLogo.vel.y *= -1;                                //actual bounce
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
-        timer = 0;
+        G.TIMER = 0;
 
     //bounce off the left or the right
     }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
-        if ((input.isJustPressed || input.isJustReleased || input.isPressed) && timer <= 50) {
-            play("coin");
-            addScore(10)
-            // console.log(timer)
-        }
         particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
         randColor();                                        //change color
         dvdLogo.vel.x *= -1;                                //actual bounce
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
-        timer = 0;
+        G.TIMER = 0;
 
     }
 
