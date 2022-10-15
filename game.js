@@ -230,6 +230,7 @@ function update() {
     if(audio.paused){
         end();
     }
+    console.log(G.TIMER); //ticks/cycle is not consistant
     G.TIMER++;
     // console.log(timer)
     
@@ -249,23 +250,26 @@ function update() {
         }
     }
 
-    //detect if logo is out of bounds
-    //bounce off the top or the bottom
-    if(dvdLogo.pos.y > G.BOUNDS_BOT || dvdLogo.pos.y < G.BOUNDS_TOP){
-        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
-        randColor();                                        //change color
-        dvdLogo.vel.y *= -1;                                //actual bounce
-        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
-        G.TIMER = 0;
+    //Maintains perfect sync with TPB
+    if(G.TIMER == G.TPB){
+        //detect if logo is out of bounds
+        //bounce off the top or the bottom
+        if(dvdLogo.pos.y > G.BOUNDS_BOT-1 || dvdLogo.pos.y < G.BOUNDS_TOP+1){
+            particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
+            randColor();                                        //change color
+            dvdLogo.vel.y *= -1;                                //actual bounce
+            dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
+            G.TIMER = 0;
 
-    //bounce off the left or the right
-    }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT|| dvdLogo.pos.x < G.BOUNDS_LEFT){
-        particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
-        randColor();                                        //change color
-        dvdLogo.vel.x *= -1;                                //actual bounce
-        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
-        G.TIMER = 0;
+        //bounce off the left or the right
+        }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT-1|| dvdLogo.pos.x < G.BOUNDS_LEFT+1){
+            particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
+            randColor();                                        //change color
+            dvdLogo.vel.x *= -1;                                //actual bounce
+            dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
+            G.TIMER = 0;
 
+        }
     }
 
     //ensure logo is never out of bounds at the end of a tick
