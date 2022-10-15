@@ -68,9 +68,10 @@ ll
 const G ={
    WIDTH: 200,
    HEIGHT: 150, 
-   BPM: 76.555, //BPM of song - change as necessasary
-   BPS: 76.555/60,
-   BPT: (76.555/60)/60, //Beats per tick - actualy useful for distance calculation
+   BPM: 120, //BPM of song - change as necessasary
+   BPS: 0,
+   BPT: 0, //Beats per tick - actualy useful for distance calculation
+   TPB: 0,
    //offsets so that sprite bouces at edge of screen
    BOUNDS_RIGHT:200-11,
    BOUNDS_LEFT:10,
@@ -78,6 +79,9 @@ const G ={
    BOUNDS_BOT:150-5,
    LASTCOLOR:0 //ensures no color duplication
 };
+G.BPS = G.BPM/60;
+G.BPT = G.BPS/60;
+G.TPB = 1/G.BPT;
 
 dvdLogo = {
     pos: vec(G.WIDTH/2,G.HEIGHT/2), //location of center of sprite
@@ -211,14 +215,14 @@ options = {
 };
 
 //upload music file
-var audio = new Audio('music.mp3'); 
+var audio = new Audio('Disco Dance.mp3'); 
 timer = 0;
 
 function update() {
     if (!ticks) {
         //play music at start of game
         audio.play();
-        
+        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
     }
     // end the game if music is finished
     if(audio.paused){
