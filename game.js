@@ -222,7 +222,10 @@ var audio = new Audio('Disco Dance.mp3');
 function update() {
     if (!ticks) {
         //play music at start of game
-        audio.play();
+        audio.play();//reset everything
+        dvdLogo.pos.x = G.WIDTH/2;
+        dvdLogo.pos.y = G.HEIGHT/2;
+        dvdLogo.vel = vec(1/2, sqrt(3)/2);
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
         G.TIMER = 0;
     }
@@ -251,7 +254,7 @@ function update() {
     }
 
     //Maintains perfect sync with TPB
-    if(G.TIMER == G.TPB){
+    if(G.TIMER >= G.TPB){ //should always be equal, but could get stuck otherwise
         //detect if logo is out of bounds
         //bounce off the top or the bottom
         if(dvdLogo.pos.y > G.BOUNDS_BOT-1 || dvdLogo.pos.y < G.BOUNDS_TOP+1){
@@ -262,7 +265,7 @@ function update() {
             G.TIMER = 0;
 
         //bounce off the left or the right
-        }else if(dvdLogo.pos.x > G.BOUNDS_RIGHT-1|| dvdLogo.pos.x < G.BOUNDS_LEFT+1){
+        }else{
             particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
             randColor();                                        //change color
             dvdLogo.vel.x *= -1;                                //actual bounce
