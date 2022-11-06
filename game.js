@@ -72,18 +72,22 @@ const G ={
    BPS: 0,
    BPT: 0, //Beats per tick - actualy useful for distance calculation
    TPB: 0,
+   MILISPERBEAT: 0, //number of miliseconds between ticks
    //offsets so that sprite bouces at edge of screen
    BOUNDS_RIGHT:200-11,
    BOUNDS_LEFT:10,
    BOUNDS_TOP:6,
    BOUNDS_BOT:150-5,
    LASTCOLOR:0, //ensures no color duplication
-   TIMERWIDTH: 5, //the number of ticks on either side of a bounce that are valid for scoring
-   TIMER: 0
+   TIMERWIDTH: 80, //the number of miliseconds on either side of a bounce that are valid for scoring
+   TIMER: 0,
+   LAST_CLOCK: 0, //used for getting the system clock
+   DELTA_TIME: 0  //time between ticks
 };
 G.BPS = G.BPM/60;
 G.BPT = G.BPS/60;
 G.TPB = 1/G.BPT;
+G.MILISPERBEAT = 60000/G.BPM;
 
 dvdLogo = {
     pos: vec(G.WIDTH/2,G.HEIGHT/2), //location of center of sprite
@@ -228,14 +232,20 @@ function update() {
         dvdLogo.vel = vec(1/2, sqrt(3)/2);
         dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
         G.TIMER = 0;
+        G.LAST_CLOCK = Date.now();
+        console.log(G.MILISPERBEAT);
     }
+    //get time between ticks
+    G.DELTA_TIME = Date.now() - G.LAST_CLOCK;
+    G.LAST_CLOCK = Date.now();
+    //console.log(G.DELTA_TIME);
     // end the game if music is finished
     if(audio.paused){
         end();
     }
-    console.log(G.TIMER); //ticks/cycle is not consistant
-    G.TIMER++;
-    // console.log(timer)
+    //console.log(G.TIMER); //ticks/cycle is not consistant
+    G.TIMER +=G.DELTA_TIME;
+    console.log(G.TIMER)
     
     //update logo position
     dvdLogo.pos.x += dvdLogo.vel.x*dvdLogo.speed;
@@ -244,7 +254,7 @@ function update() {
     //check for input on beat
     if(input.isJustPressed){
         //check for within timerBuffer
-        if(G.TIMER < G.TIMERWIDTH || G.TIMER > (G.TPB - G.TIMERWIDTH)){
+        if(G.TIMER < G.TIMERWIDTH || G.TIMER > (G.MILISPERBEAT - G.TIMERWIDTH)){
             play("coin");
             addScore(10);
         }
@@ -254,7 +264,7 @@ function update() {
     }
 
     //Maintains perfect sync with TPB
-    if(G.TIMER >= G.TPB){ //should always be equal, but could get stuck otherwise
+    if(G.TIMER >= G.MILISPERBEAT){ //detect if time/beat has been reached
         //detect if logo is out of bounds
         //bounce off the top or the bottom
         if(dvdLogo.pos.y > G.BOUNDS_BOT-1 || dvdLogo.pos.y < G.BOUNDS_TOP+1){
@@ -262,7 +272,7 @@ function update() {
             randColor();                                        //change color
             dvdLogo.vel.y *= -1;                                //actual bounce
             dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
-            G.TIMER = 0;
+            G.TIMER -= 500;                                     //reset timer, but accounting for slop
 
         //bounce off the left or the right
         }else{
@@ -270,7 +280,7 @@ function update() {
             randColor();                                        //change color
             dvdLogo.vel.x *= -1;                                //actual bounce
             dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
-            G.TIMER = 0;
+            G.TIMER -= 500;                                     //reset timer, but accounting for slop
 
         }
     }
