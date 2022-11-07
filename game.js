@@ -92,7 +92,9 @@ G.MILISPERBEAT = 60000/G.BPM;
 dvdLogo = {
     pos: vec(G.WIDTH/2,G.HEIGHT/2), //location of center of sprite
     vel: vec(1/2, sqrt(3)/2),       //direction of movement
-    speed: 1,                       //distace travled per tick
+    normVel: vec(0,0),
+    dist: 1,                       //distace travled per tick
+    nextBounce: "foo",
     //offsets for the sprites
     aPos: vec(-7,-3),
     bPos: vec(-1,-3),
@@ -114,6 +116,8 @@ dvdLogo = {
         char('h',dvdLogo.pos.x+dvdLogo.hPos.x,dvdLogo.pos.y+dvdLogo.hPos.y);
     },
 }
+dvdLogo.normVel.x = dvdLogo.vel.x/(sqrt(dvdLogo.vel.x**2+dvdLogo.vel.y**2));
+dvdLogo.normVel.y = dvdLogo.vel.y/(sqrt(dvdLogo.vel.x**2+dvdLogo.vel.y**2));
 
 //calculates the distance to the next bounce
 function calcDist(G,D){
@@ -122,32 +126,32 @@ function calcDist(G,D){
     topint = false
     bot = false
     left = false
-    if(D.vel.x > 0 ){//is it possible to hit right
-        if(D.vel.y < 0){//is it possible to hit top
-            r = (G.BOUNDS_RIGHT-D.pos.x)/D.vel.x
-            t = (G.BOUNDS_TOP-D.pos.y)/D.vel.y
+    if(D.normVel.x > 0 ){//is it possible to hit right
+        if(D.normVel.y < 0){//is it possible to hit top
+            r = (G.BOUNDS_RIGHT-D.pos.x)/D.normVel.x
+            t = (G.BOUNDS_TOP-D.pos.y)/D.normVel.y
             if(r<t){right = true}else{topint = true}
         }else{//is it possible to hit bot
-            r = (G.BOUNDS_RIGHT-D.pos.x)/D.vel.x
-            b = (G.BOUNDS_BOT-D.pos.y)/D.vel.y
+            r = (G.BOUNDS_RIGHT-D.pos.x)/D.normVel.x
+            b = (G.BOUNDS_BOT-D.pos.y)/D.normVel.y
             if(r<b){right = true}else{bot=true}
         }
     }else{ //is it possible to hit left
-        if(D.vel.y < 0){//is it possible to hit top
-            l = (G.BOUNDS_LEFT-D.pos.x)/D.vel.x
-            t = (G.BOUNDS_TOP-D.pos.y)/D.vel.y
+        if(D.normVel.y < 0){//is it possible to hit top
+            l = (G.BOUNDS_LEFT-D.pos.x)/D.normVel.x
+            t = (G.BOUNDS_TOP-D.pos.y)/D.normVel.y
             if(l<t){left = true}else{topint=true}
         }else{//is it possible to hit bot
-            l = (G.BOUNDS_LEFT-D.pos.x)/D.vel.x
-            b = (G.BOUNDS_BOT-D.pos.y)/D.vel.y
+            l = (G.BOUNDS_LEFT-D.pos.x)/D.normVel.x
+            b = (G.BOUNDS_BOT-D.pos.y)/D.normVel.y
             if(l<b){left = true}else{bot=true}
         }
     }
     //find dist by similar triangles
-    if(topint){return abs((G.BOUNDS_TOP-D.pos.y)/D.vel.y)}
-    if(bot){return abs((G.BOUNDS_BOT-D.pos.y)/D.vel.y)}
-    if(left){return abs((G.BOUNDS_LEFT-D.pos.x)/D.vel.x)}
-    if(right){return abs((G.BOUNDS_RIGHT-D.pos.x)/D.vel.x)}
+    if(topint){D.nextBounce = "t";return abs((G.BOUNDS_TOP-D.pos.y)/D.normVel.y)}
+    if(bot){D.nextBounce = "b";return abs((G.BOUNDS_BOT-D.pos.y)/D.normVel.y)}
+    if(left){D.nextBounce = "l";return abs((G.BOUNDS_LEFT-D.pos.x)/D.normVel.x)}
+    if(right){D.nextBounce = "r";return abs((G.BOUNDS_RIGHT-D.pos.x)/D.normVel.x)}
 }
 //changes to a random color, use to switch colors
 function randColor() {
@@ -230,26 +234,24 @@ function update() {
         dvdLogo.pos.x = G.WIDTH/2;
         dvdLogo.pos.y = G.HEIGHT/2;
         dvdLogo.vel = vec(1/2, sqrt(3)/2);
-        dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;
+        dvdLogo.dist = calcDist(G,dvdLogo);
         G.TIMER = 0;
         G.LAST_CLOCK = Date.now();
-        console.log(G.MILISPERBEAT);
     }
     //get time between ticks
     G.DELTA_TIME = Date.now() - G.LAST_CLOCK;
     G.LAST_CLOCK = Date.now();
-    //console.log(G.DELTA_TIME);
     // end the game if music is finished
     if(audio.paused){
         end();
     }
-    //console.log(G.TIMER); //ticks/cycle is not consistant
     G.TIMER +=G.DELTA_TIME;
-    console.log(G.TIMER)
-    
+
+    netSpeed = dvdLogo.dist/G.MILISPERBEAT;
     //update logo position
-    dvdLogo.pos.x += dvdLogo.vel.x*dvdLogo.speed;
-    dvdLogo.pos.y += dvdLogo.vel.y*dvdLogo.speed;
+    dvdLogo.pos.x += dvdLogo.normVel.x*netSpeed*G.DELTA_TIME;
+    dvdLogo.pos.y += dvdLogo.normVel.y*netSpeed*G.DELTA_TIME;
+
 
     //check for input on beat
     if(input.isJustPressed){
@@ -267,19 +269,19 @@ function update() {
     if(G.TIMER >= G.MILISPERBEAT){ //detect if time/beat has been reached
         //detect if logo is out of bounds
         //bounce off the top or the bottom
-        if(dvdLogo.pos.y > G.BOUNDS_BOT-1 || dvdLogo.pos.y < G.BOUNDS_TOP+1){
+        if(dvdLogo.nextBounce == "t"|| dvdLogo.nextBounce == "b"){
             particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
             randColor();                                        //change color
-            dvdLogo.vel.y *= -1;                                //actual bounce
-            dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
+            dvdLogo.normVel.y *= -1;                            //actual bounce
+            dvdLogo.dist = calcDist(G,dvdLogo);                 //calculate new distance
             G.TIMER -= 500;                                     //reset timer, but accounting for slop
 
         //bounce off the left or the right
         }else{
             particle(dvdLogo.pos.x, dvdLogo.pos.y, 40, 3, 90);  //sparkles
             randColor();                                        //change color
-            dvdLogo.vel.x *= -1;                                //actual bounce
-            dvdLogo.speed = calcDist(G,dvdLogo)*G.BPT;          //calculate new speed
+            dvdLogo.normVel.x *= -1;                            //actual bounce
+            dvdLogo.dist = calcDist(G,dvdLogo);                 //calculate new speed
             G.TIMER -= 500;                                     //reset timer, but accounting for slop
 
         }
