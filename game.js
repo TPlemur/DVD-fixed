@@ -225,7 +225,7 @@ options = {
 };
 
 //upload music file
-var audio = new Audio('120Click.mp3'); //'Disco Dance.mp3'
+var audio = new Audio('Disco Dance.mp3'); //'Disco Dance.mp3'
 
 function update() {
     if (!ticks) {
