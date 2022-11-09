@@ -274,7 +274,7 @@ function update() {
             randColor();                                        //change color
             dvdLogo.normVel.y *= -1;                            //actual bounce
             dvdLogo.dist = calcDist(G,dvdLogo);                 //calculate new distance
-            G.TIMER -= 500;                                     //reset timer, but accounting for slop
+            G.TIMER -= G.MILISPERBEAT;                          //reset timer, but accounting for slop
 
         //bounce off the left or the right
         }else{
@@ -282,7 +282,7 @@ function update() {
             randColor();                                        //change color
             dvdLogo.normVel.x *= -1;                            //actual bounce
             dvdLogo.dist = calcDist(G,dvdLogo);                 //calculate new speed
-            G.TIMER -= 500;                                     //reset timer, but accounting for slop
+            G.TIMER -= G.MILISPERBEAT;                          //reset timer, but accounting for slop
 
         }
     }
